@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeLedger AI — Personal Document Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-glow: rgba(37, 99, 235, 0.15);
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --warning: #d97706;
+            --warning-bg: #fef3c7;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --info: #0284c7;
+            --info-bg: #e0f2fe;
+            --badge-high-bg: #fee2e2;
+            --badge-high-text: #991b1b;
+            --badge-med-bg: #fef3c7;
+            --badge-med-text: #92400e;
+            --badge-low-bg: #dcfce7;
+            --badge-low-text: #166534;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0b0f19;
+                --card-bg: #131c2e;
+                --text-color: #f8fafc;
+                --text-muted: #94a3b8;
+                --border-color: #1e293b;
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+                --primary-glow: rgba(59, 130, 246, 0.2);
+                --danger: #ef4444;
+                --danger-bg: rgba(239, 68, 68, 0.15);
+                --warning: #f59e0b;
+                --warning-bg: rgba(245, 158, 11, 0.15);
+                --success: #22c55e;
+                --success-bg: rgba(34, 197, 94, 0.15);
+                --info: #38bdf8;
+                --info-bg: rgba(56, 189, 248, 0.15);
+                --badge-high-bg: rgba(239, 68, 68, 0.2);
+                --badge-high-text: #fca5a5;
+                --badge-med-bg: rgba(245, 158, 11, 0.2);
+                --badge-med-text: #fde047;
+                --badge-low-bg: rgba(34, 197, 94, 0.2);
+                --badge-low-text: #86efac;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 24px 16px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background Blob for Login */
+        @media (prefers-reduced-motion: no-preference) {
+            body::before {
+                content: '';
+                position: fixed;
+                top: -200px;
+                right: -200px;
+                width: 600px;
+                height: 600px;
+                background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(147, 51, 234, 0.12));
+                border-radius: 50%;
+                z-index: -1;
+                filter: blur(80px);
+                animation: floatBlob 12s ease-in-out infinite alternate;
+                pointer-events: none;
+            }
+            @keyframes floatBlob {
+                0% { transform: translate(0, 0) scale(1); }
+                100% { transform: translate(-50px, 60px) scale(1.1); }
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            button:hover {
+                background-color: var(--primary-hover);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px var(--primary-glow);
+            }
+            button:active {
+                transform: translateY(0);
+            }
+        }
+
+        button.secondary {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            transform: none;
+            box-shadow: none;
+        }
+
+        button.danger {
+            background-color: var(--danger);
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+
+        button.danger:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .card {
+                animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            .card:nth-child(1) { animation-delay: 0.05s; }
+            .card:nth-child(2) { animation-delay: 0.1s; }
+            .card:nth-child(3) { animation-delay: 0.15s; }
+            .card:nth-child(4) { animation-delay: 0.2s; }
+
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(16px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            margin-bottom: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Auth View */
+        #auth-container {
+            max-width: 420px;
+            margin: 60px auto;
+            padding: 36px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="email"], input[type="password"], input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background-color: var(--card-bg);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .auth-switch {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main App Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 800px) {
+            .grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Task List */
+        .task-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 16px;
+            background-color: var(--card-bg);
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: var(--transition);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .task-item:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow);
+            }
+        }
+
+        .task-item.urgent {
+            border-left: 4px solid var(--danger);
+            background: linear-gradient(90deg, var(--danger-bg) 0%, var(--card-bg) 25%);
+        }
+
+        .task-item.warning {
+            border-left: 4px solid var(--warning);
+            background: linear-gradient(90deg, var(--warning-bg) 0%, var(--card-bg) 25%);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            gap: 12px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 1.025rem;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge.high { background: var(--badge-high-bg); color: var(--badge-high-text); }
+        .badge.medium { background: var(--badge-med-bg); color: var(--badge-med-text); }
+        .badge.low { background: var(--badge-low-bg); color: var(--badge-low-text); }
+
+        .task-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .task-quote {
+            font-style: italic;
+            font-size: 0.875rem;
+            border-left: 2px solid var(--border-color);
+            padding-left: 12px;
+            margin: 10px 0;
+            color: var(--text-muted);
+            background: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* Documents List */
+        .doc-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            transition: var(--transition);
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .doc-item:hover {
+                box-shadow: var(--shadow);
+            }
+        }
+
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .doc-name {
+            font-weight: 600;
+            font-size: 1.025rem;
+        }
+
+        .doc-summary {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .facts-box {
+            font-size: 0.85rem;
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .facts-box ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 6px 16px;
+            list-style: none;
+        }
+
+        /* Ask Box */
+        .chat-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .answer-result {
+            background: var(--bg-color);
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 6px;
+            margin-top: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 20px;
+            font-size: 0.95rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
+        }
+
+        /* Status & Processing Animation */
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-status.ready {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-status.failed {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-status.processing {
+            background: var(--warning-bg);
+            color: var(--warning);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .badge-status.processing::after {
+                content: '';
+                position: absolute;
+                top: 0; right: 0; bottom: 0; left: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                animation: shimmer 1.5s infinite;
+            }
+            @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+
+            .badge-status.ready {
+                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            @keyframes popIn {
+                0% { transform: scale(0.9); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        }
+
+        /* Spinner & Typing Dots */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .typing-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* File Input Styling */
+        input[type="file"] {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            padding: 8px 0;
+        }
+        input[type="file"]::file-selector-button {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: inherit;
+            margin-right: 12px;
+            transition: var(--transition);
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Accessibility Focus */
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Screen -->
+        <div id="auth-view" style="display: none;">
+            <div id="auth-container">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div class="logo-icon" style="margin: 0 auto 12px auto; width: 56px; height: 56px; font-size: 1.5rem;">LL</div>
+                    <h1 id="auth-title" style="font-size: 1.5rem;">LifeLedger AI</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Turn unstructured documents into actionable insights</p>
+                </div>
+                <form id="auth-form" onsubmit="handleAuth(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="auth-email" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password (min 8 chars)</label>
+                        <input type="password" id="auth-password" required placeholder="••••••••">
+                    </div>
+                    <div id="auth-error" class="error-msg"></div>
+                    <button type="submit" id="auth-btn" style="width: 100%; margin-top: 8px; padding: 12px; font-size: 1rem;">Sign In</button>
+                </form>
+                <div class="auth-switch">
+                    <span id="auth-switch-text">Don't have an account?</span>
+                    <a onclick="toggleAuthMode()">Register</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Screen -->
+        <div id="app-view" style="display: none;">
+            <header>
+                <div class="logo-area">
+                    <div class="logo-icon">LL</div>
+                    <h1>LifeLedger AI</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span id="user-email-display" style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500;"></span>
+                    <button class="secondary" onclick="logout()">Sign Out</button>
+                </div>
+            </header>
+
+            <!-- Upload Card -->
+            <div class="card">
+                <h2>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Upload Document
+                </h2>
+                <form id="upload-form" onsubmit="handleUpload(event)">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <input type="file" id="pdf-file" accept=".pdf" required>
+                    </div>
+                    <div id="upload-error" class="error-msg"></div>
+                    <button type="submit" id="upload-btn">Upload & Analyze PDF</button>
+                </form>
+            </div>
+
+            <div class="grid-2">
+                <!-- What Needs Attention -->
+                <div class="card">
+                    <h2>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        What Needs My Attention
+                    </h2>
+                    <div id="tasks-list">
+                        <div class="empty-state">Loading tasks...</div>
+                    </div>
+                </div>
+
+                <!-- Ask My Documents -->
+                <div class="card">
+                    <h2>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        Ask My Documents
+                    </h2>
+                    <form class="chat-box" onsubmit="handleAsk(event)">
+                        <input type="text" id="ask-input" placeholder="e.g. When is my lease renewal?" required>
+                        <button type="submit">Ask</button>
+                    </form>
+                    <div id="ask-result" style="display: none;" class="answer-result">
+                        <div id="answer-text"></div>
+                        <div id="sources-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents List -->
+            <div class="card">
+                <h2>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    My Documents
+                </h2>
+                <div id="documents-list">
+                    <div class="empty-state">Loading documents...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRegisterMode = false;
+        let token = localStorage.getItem("lifeledger_token");
+        let pollTimer = null;
+
+        function init() {
+            if (token) {
+                document.getElementById("auth-view").style.display = "none";
+                document.getElementById("app-view").style.display = "block";
+                loadAppData();
+                startPolling();
+            } else {
+                document.getElementById("auth-view").style.display = "block";
+                document.getElementById("app-view").style.display = "none";
+            }
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById("auth-title").innerText = isRegisterMode ? "Create Account" : "Sign In";
+            document.getElementById("auth-btn").innerText = isRegisterMode ? "Register" : "Sign In";
+            document.getElementById("auth-switch-text").innerText = isRegisterMode ? "Already have an account?" : "Don't have an account?";
+            document.querySelector(".auth-switch a").innerText = isRegisterMode ? "Sign In" : "Register";
+            document.getElementById("auth-error").innerText = "";
+        }
+
+        async function handleAuth(event) {
+            event.preventDefault();
+            const email = document.getElementById("auth-email").value;
+            const password = document.getElementById("auth-password").value;
+            const errorEl = document.getElementById("auth-error");
+            errorEl.innerText = "";
+
+            const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
+
+            try {
+                const resp = await fetch(endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.detail || "Authentication failed");
+                }
+
+                token = data.access_token;
+                localStorage.setItem("lifeledger_token", token);
+                init();
+            } catch (err) {
+                errorEl.innerText = err.message;
+            }
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem("lifeledger_token");
+            if (pollTimer) clearInterval(pollTimer);
+            init();
+        }
+
+        async function apiFetch(url, options = {}) {
+            let headers = options.headers || {};
+            headers["Authorization"] = `Bearer ${token}`;
+            options.headers = headers;
+
+            const resp = await fetch(url, options);
+            if (resp.status === 401) {
+                logout();
+                throw new Error("Session expired. Please sign in again.");
+            }
+            return resp;
+        }
+
+        async function handleUpload(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById("pdf-file");
+            const errorEl = document.getElementById("upload-error");
+            const btn = document.getElementById("upload-btn");
+            errorEl.innerText = "";
+
+            if (fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+
+            if (file.size > 10 * 1024 * 1024) {
+                errorEl.innerText = "File size exceeds 10 MB limit.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Uploading...';
+
+            try {
+                const resp = await fetch("/api/documents", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.detail || "Upload failed");
+                }
+
+                fileInput.value = "";
+                loadAppData();
+                startPolling();
+            } catch (err) {
+                errorEl.innerText = err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Upload & Analyze PDF";
+            }
+        }
+
+        async function loadAppData() {
+            await Promise.all([loadTasks(), loadDocuments()]);
+        }
+
+        async function loadTasks() {
+            const container = document.getElementById("tasks-list");
+            try {
+                const resp = await fetch("/api/tasks", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (resp.status === 401) { logout(); return; }
+                const tasks = await resp.json();
+
+                if (tasks.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No active obligations or tasks found. Upload a document to get started.</div>';
+                    return;
+                }
+
+                let html = "";
+                for (const t of tasks) {
+                    let urgencyClass = "";
+                    let deadlineText = "No deadline";
+
+                    if (t.deadline !== null) {
+                        const days = t.days_left;
+                        if (days < 0) {
+                            urgencyClass = "urgent";
+                            deadlineText = `${Math.abs(days)} days overdue (${t.deadline})`;
+                        } else if (days <= 7) {
+                            urgencyClass = "warning";
+                            deadlineText = `${days} days left (${t.deadline})`;
+                        } else {
+                            deadlineText = `${days} days left (${t.deadline})`;
+                        }
+                    }
+
+                    const isDone = t.status === "done";
+                    if (isDone) urgencyClass = "";
+
+                    html += `
+                        <div class="task-item ${urgencyClass}" style="${isDone ? 'opacity: 0.6;' : ''}">
+                            <div class="task-header">
+                                <span class="task-title" ${isDone ? 'style="text-decoration: line-through;"' : ''}>${escapeHtml(t.title)}</span>
+                                <span class="badge ${t.priority}">${t.priority}</span>
+                            </div>
+                            <div class="task-meta">
+                                📄 ${escapeHtml(t.document_name)} ${t.source_page ? `(p. ${t.source_page})` : ''} • ⏰ ${deadlineText}
+                            </div>
+                            ${t.quote ? `<div class="task-quote">"${escapeHtml(t.quote)}"</div>` : ''}
+                            <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                                <button class="secondary" style="font-size: 0.8rem; padding: 6px 14px;" onclick="toggleTaskStatus(${t.id}, '${t.status}')">
+                                    ${isDone ? 'Reopen' : 'Mark Done'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = '<div class="empty-state">Failed to load tasks.</div>';
+            }
+        }
+
+        async function toggleTaskStatus(taskId, currentStatus) {
+            const newStatus = currentStatus === "open" ? "done" : "open";
+            try {
+                await fetch(`/api/tasks/${taskId}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                loadTasks();
+            } catch (err) {
+                alert("Failed to update task status");
+            }
+        }
+
+        async function loadDocuments() {
+            const container = document.getElementById("documents-list");
+            try {
+                const resp = await fetch("/api/documents", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (resp.status === 401) { logout(); return; }
+                const docs = await resp.json();
+
+                let hasProcessing = false;
+
+                if (docs.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No documents uploaded yet.</div>';
+                    return;
+                }
+
+                let html = "";
+                for (const d of docs) {
+                    if (d.status === "processing") hasProcessing = true;
+
+                    let factsHtml = "";
+                    if (d.key_facts && Object.keys(d.key_facts).length > 0) {
+                        factsHtml = '<div class="facts-box"><strong style="display: block; margin-bottom: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Key Facts</strong><ul>';
+                        for (const [k, v] of Object.entries(d.key_facts)) {
+                            factsHtml += `<li><strong>${escapeHtml(k)}:</strong> ${escapeHtml(v)}</li>`;
+                        }
+                        factsHtml += '</ul></div>';
+                    }
+
+                    let statusBadge = `<span class="badge-status" style="background: var(--border-color); color: var(--text-muted);">${d.status}</span>`;
+                    if (d.status === "done") statusBadge = `<span class="badge-status ready">ready</span>`;
+                    if (d.status === "failed") statusBadge = `<span class="badge-status failed">failed</span>`;
+                    if (d.status === "processing") statusBadge = `<span class="badge-status processing">processing</span>`;
+
+                    html += `
+                        <div class="doc-item">
+                            <div class="doc-header">
+                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                    <span class="doc-name">${escapeHtml(d.name)}</span>
+                                    <span class="badge" style="background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted);">${escapeHtml(d.doc_type)}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    ${statusBadge}
+                                    <button class="danger" style="font-size: 0.8rem; padding: 6px 12px;" onclick="deleteDoc(${d.id})">Delete</button>
+                                </div>
+                            </div>
+                            <div class="doc-summary">${escapeHtml(d.summary)}</div>
+                            ${factsHtml}
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+
+                if (!hasProcessing && pollTimer) {
+                    clearInterval(pollTimer);
+                    pollTimer = null;
+                }
+            } catch (err) {
+                container.innerHTML = '<div class="empty-state">Failed to load documents.</div>';
+            }
+        }
+
+        function startPolling() {
+            if (pollTimer) return;
+            pollTimer = setInterval(() => {
+                loadAppData();
+            }, 3000);
+        }
+
+        async function deleteDoc(docId) {
+            if (!confirm("Are you sure you want to delete this document, its chunks, and obligations?")) return;
+            try {
+                const resp = await fetch(`/api/documents/${docId}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (!resp.ok) throw new Error("Delete failed");
+                loadAppData();
+            } catch (err) {
+                alert("Failed to delete document");
+            }
+        }
+
+        async function handleAsk(event) {
+            event.preventDefault();
+            const input = document.getElementById("ask-input");
+            const resultBox = document.getElementById("ask-result");
+            const answerText = document.getElementById("answer-text");
+            const sourcesContainer = document.getElementById("sources-container");
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            answerText.innerHTML = '<span class="spinner"></span>Thinking<span class="typing-dots"></span>';
+            sourcesContainer.innerHTML = "";
+            resultBox.style.display = "block";
+
+            try {
+                const resp = await fetch("/api/ask", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ question })
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.detail || "Failed to get answer");
+                }
+
+                answerText.innerText = data.answer;
+
+                let sourcesHtml = "";
+                if (data.sources && data.sources.length > 0) {
+                    sourcesHtml = '<div style="margin-top: 14px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Sources: ';
+                    for (const s of data.sources) {
+                        sourcesHtml += `<span class="source-tag">📄 ${escapeHtml(s.document)}, p. ${s.page}</span>`;
+                    }
+                    sourcesHtml += '</div>';
+                }
+                sourcesContainer.innerHTML = sourcesHtml;
+            } catch (err) {
+                answerText.innerText = "Error: " + err.message;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Run on load
+        init();
+    </script>
+</body>
+</html>
